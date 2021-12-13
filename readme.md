@@ -1,2 +1,3 @@
 # Project on development
-# Contributors all welcome =]
+## Contributors all welcome =]
+## Just ask for a pull request
