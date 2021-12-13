@@ -18,31 +18,13 @@
 * 				Two hierarchical: 		category/maincat2/subcat
 * 				Three hierarchical: 		category/maincat2/subcat/subsubcat	
 *
-* ###########################################################################
-* 				   HOW TO USE
-* ###########################################################################
-*
-* STEP 1) Add your duplicated sub categories in the array $ASW_CAT_SLUG_REWRITED
-* 				ex: array("duplicated_slug", "new_permalink", "term_id"),
-*				array("subcat-maincat2", "category/maincat2/subcat", "10"),
-*
-* STEP 2) Adjust the permalinks prefix in the variable $PREFIX_PERMALINK
-*				Default prefix is "category" 
-*				If there is no prefix, then put an empty string like so ""
-*
-* STEP 3) Go to Wordpress menu in settings/permalink and hit the save button to rewrite the rules of Wordpress.
-*
-* DONE!
-*
 * ##########################################################################
 * 				   TODO 
 * ##########################################################################
 *
-* Make this fully automated without adding duplicated categories manually
-* 0) for each categories do:
-* 1) find slugs that has "-"
-* 2) construct new permalink
-* 3) get the term id
+* Bug testing
+* Check for securities issues
+* etc.
 */
 
 
@@ -50,14 +32,18 @@ add_action('init', 'asw_add_rewrite_rules');
 function asw_add_rewrite_rules(){
 	// ADJUST HERE THE PERMALINKS PREFIX
 	$PREFIX_PERMALINK = "category";
-	$ASW_CAT_SLUG_REWRITED = array(
-		// ADD HERE YOUR DUPLICATED SUB-CATEGORIES
-		// array("duplicated_slug", "new_permalink", "slug_id"),
-	);
+	$cats = get_categories();
 	
-	foreach($ASW_CAT_SLUG_REWRITED as $cat){
-		add_rewrite_rule($PREFIX_PERMALINK . $cat[1] . '/?$', 'index.php?cat='.$cat[2] ,'top');
-	}
+	foreach($cats as $cat){
+		if($cat->parent != 0 && strpos($cat->slug, '-') != false){
+			$splitted_slug = explode("-", $cat->slug);
+			$new_permalink = "/";
+			$slugs	= array_reverse($splitted_slug);
+			for($i =0; $i < count($slugs); $i++){$new_permalink .= $slugs[$i] . "/";}
+			add_rewrite_rule($PREFIX_PERMALINK . $new_permalink .'?$', 'index.php?cat='.$cat->term_id ,'top');
+		}
+	}	
+
 }
 
 add_filter( 'term_link', 'asw_new_permalinks', 10, 3 );
@@ -79,3 +65,8 @@ function asw_new_permalinks( $permalink, $term, $taxonomy ){
 	}
 	return $new_permalink;    
 }
+
+add_filter('rewrite_rules_array', function($rules){
+    do_action('logger', $rules);
+    return $rules;
+});
