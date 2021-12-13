@@ -9,5 +9,5 @@
 - Make this conform to Wordpress
 - Flush the rewrite rules into activation plugin
 - Bug testing
-- Imporvments
+- Any improvments
 - etc.
