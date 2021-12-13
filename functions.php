@@ -17,14 +17,6 @@
 * 				One hierarchical: 		category/maincat2/
 * 				Two hierarchical: 		category/maincat2/subcat
 * 				Three hierarchical: 		category/maincat2/subcat/subsubcat	
-*
-* ##########################################################################
-* 				   TODO 
-* ##########################################################################
-*
-* Bug testing
-* Check for securities issues
-* etc.
 */
 
 
