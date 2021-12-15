@@ -1,24 +1,25 @@
 <?php
-/*
-* ###########################################################################
-* 				   DESCRIPTION
-* ###########################################################################
+/**
+* @link              alexsoluweb.digital
+* @since             1.0.0
+* @package           Duplicated_Sub_Category_Permalink_Fixer
 *
-* Not duplicated categories example:
-* 				One hierarchical: 		category/maincat1/
-* 				Two hierarchical: 		category/maincat1/subcat
-* 				Three hierarchical: 		category/maincat1/subcat/subsubcat
-* Duplicated categories structures slug must be like so:
-* 				One hierarchical: 		category/maincat2/
-* 				Two hierarchical: 		category/maincat2/subcat-maincat2
-* 				Three hierarchical: 		category/maincat2/subcat-maincat2/subsubcat-subcat-maincat2
-*
-* New permalinks on duplicated categories will generate this:
-* 				One hierarchical: 		category/maincat2/
-* 				Two hierarchical: 		category/maincat2/subcat
-* 				Three hierarchical: 		category/maincat2/subcat/subsubcat	
-*/
+* @wordpress-plugin
+* Plugin Name:       duplicated sub category permalink fixer
+* Plugin URI:        https://github.com/alexsoluweb/duplicated-sub-category-permalink-fixer
+* Description:       Fix duplicated sub categories permalink
+* Version:           1.0.0
+* Author:            Alexsoluweb
+* Author URI:        alexsoluweb.digital
+* License:           GPL-2.0+
+* License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
+* Text Domain:       duplicated-sub-category-permalink-fixer	
+**/
 
+// If this file is called directly, abort.
+if ( ! defined( 'WPINC' ) ) {
+	die;
+}
 
 add_action('init', 'asw_add_rewrite_rules');
 function asw_add_rewrite_rules(){
@@ -57,3 +58,8 @@ function asw_new_permalinks( $permalink, $term, $taxonomy ){
 	}
 	return $new_permalink;    
 }
+
+add_filter('rewrite_rules_array', function($rules){
+    do_action('logger', $rules);
+    return $rules;
+});
