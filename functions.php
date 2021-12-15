@@ -58,8 +58,3 @@ function asw_new_permalinks( $permalink, $term, $taxonomy ){
 	}
 	return $new_permalink;    
 }
-
-add_filter('rewrite_rules_array', function($rules){
-    do_action('logger', $rules);
-    return $rules;
-});
