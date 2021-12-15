@@ -3,7 +3,7 @@
 - Just ask for a pull request
 
 
-## What you can contribute:
+## What you can contribute on:
 
 - Check for securities issues
 - Make this conform to Wordpress
