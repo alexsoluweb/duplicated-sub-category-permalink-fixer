@@ -56,5 +56,7 @@ function asw_new_permalinks( $permalink, $term, $taxonomy ){
 			}
 		}
 	}
-	return $new_permalink;    
+	return $new_permalink;   
 }
+
+//test
