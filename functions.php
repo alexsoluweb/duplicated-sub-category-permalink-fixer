@@ -17,8 +17,8 @@
 **/
 
 // If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
-	die;
+if ( ! defined( 'ABSPATH' ) ) {
+	wp_die();
 }
 
 define('PREFIX_PLUGIN', 'dscpf');
