@@ -1,4 +1,7 @@
 # Project on development
+- v1.0.0 on beta
+- You can test it on a dev environment but i dont recommend using it on productions.
+
 ## Contributors all welcome =]
 - Just ask for a pull request
 
@@ -7,7 +10,8 @@
 
 - Check for securities issues
 - Make this conform to Wordpress
-- Flush the rewrite rules into activation plugin
 - Bug testing
 - Any improvments
-- etc.
+
+## When beta goes to alpha
+- Push it to the Wordpress repository
