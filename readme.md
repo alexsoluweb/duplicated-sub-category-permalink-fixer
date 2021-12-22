@@ -7,7 +7,6 @@
 
 - Check for securities issues
 - Make this conform to Wordpress
-- Flush the rewrite rules into activation plugin
 - Bug testing
 - Any improvments
-- etc.
+- Push it to the Wordpress repository
