@@ -21,10 +21,21 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-add_action('init', 'asw_add_rewrite_rules');
-function asw_add_rewrite_rules(){
-	// ADJUST HERE THE PERMALINKS PREFIX
-	$PREFIX_PERMALINK = "category";
+define('PREFIX_PLUGIN', 'dscpf');
+require_once __DIR__ . '/admin/settings.php';
+
+function dscpf_run(){
+	if ( is_admin()  && current_user_can( 'manage_options')){
+		$configuration = new DSCPF_Settings();
+	}
+	add_action('init', 'dscpf_add_rewrite_rules', 100);
+	add_filter( 'term_link', 'dscpf_new_permalinks', 10, 3 );
+}
+
+function dscpf_add_rewrite_rules(){
+	$prefix = get_option( 'dscpf_option_name' )["permalink_prefix"];
+	$PREFIX_PERMALINK = isset($prefix)? $prefix : "";
+
 	$cats = get_categories();
 	
 	foreach($cats as $cat){
@@ -36,11 +47,9 @@ function asw_add_rewrite_rules(){
 			add_rewrite_rule($PREFIX_PERMALINK . $new_permalink .'?$', 'index.php?cat='.$cat->term_id ,'top');
 		}
 	}	
-
 }
 
-add_filter( 'term_link', 'asw_new_permalinks', 10, 3 );
-function asw_new_permalinks( $permalink, $term, $taxonomy ){	
+function dscpf_new_permalinks( $permalink, $term, $taxonomy ){
 	if ($term->taxonomy == "category"){
 		$slugs 		= str_replace(  home_url() , '' , $permalink);
 		$slugs 		= trim($slugs, "/");
@@ -55,8 +64,10 @@ function asw_new_permalinks( $permalink, $term, $taxonomy ){
 				$new_permalink .= "/" . $slug;
 			}
 		}
+		return $new_permalink;
 	}
-	return $new_permalink;   
+	return $permalink;   
 }
 
-//test
+
+add_action('init', 'dscpf_run');
