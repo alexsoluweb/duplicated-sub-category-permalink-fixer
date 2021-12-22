@@ -12,4 +12,6 @@
 - Make this conform to Wordpress
 - Bug testing
 - Any improvments
+
+## When beta goes to alpha
 - Push it to the Wordpress repository
