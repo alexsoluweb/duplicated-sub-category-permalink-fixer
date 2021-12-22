@@ -5,7 +5,7 @@
 * @package           Duplicated_Sub_Category_Permalink_Fixer
 *
 * @wordpress-plugin
-* Plugin Name:       duplicated sub category permalink fixer
+* Plugin Name:       DSCPF
 * Plugin URI:        https://github.com/alexsoluweb/duplicated-sub-category-permalink-fixer
 * Description:       Fix duplicated sub categories permalink
 * Version:           1.0.0
@@ -13,7 +13,7 @@
 * Author URI:        alexsoluweb.digital
 * License:           GPL-2.0+
 * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
-* Text Domain:       duplicated-sub-category-permalink-fixer	
+* Text Domain:       DSCPF	
 **/
 
 // If this file is called directly, abort.
@@ -40,7 +40,7 @@ function dscpf_add_rewrite_rules(){
 	
 	foreach($cats as $cat){
 		if($cat->parent != 0 && strpos($cat->slug, '-') != false){
-			$splitted_slug = explode("-", $cat->slug);
+				$splitted_slug = explode("-", $cat->slug);
 			$new_permalink = "/";
 			$slugs	= array_reverse($splitted_slug);
 			for($i =0; $i < count($slugs); $i++){$new_permalink .= $slugs[$i] . "/";}

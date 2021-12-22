@@ -1,7 +1,8 @@
 <?php
 
 class DSCPF_Settings {
-	public $dscpf_options;
+	private $dscpf_options;
+	public CONST ACTION = "dscpf_option_group-options";
 
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'dscpf_add_plugin_page' ) );
@@ -91,14 +92,14 @@ class DSCPF_Settings {
         <script id="js_flush_ajax_call" type="text/javascript" >
         jQuery(document).ready(function($) {$=jQuery;
             $("#flush_rewrite_rule_btn").click(function(){
-                    var data = {
+                var data = {
                     'action': 'dscpf_flush_rewrite_rule',
                     'nonce': $("#_wpnonce").val(),
                 };
         
                 // since 2.8 ajaxurl is always defined in the admin header and points to admin-ajax.php
                 $.post(ajaxurl, data, function(response) {
-                    $("#dscpf_response").html(response).css("color", "green");
+                    $("#dscpf_response").text(response).css("color", "green");
                 });
             });
 
@@ -107,16 +108,16 @@ class DSCPF_Settings {
     }
     
     public function dscpf_action_server_ajax() {
-        if ( isset( $_REQUEST['_wpnonce'] ) && wp_verify_nonce( $_REQUEST['_wpnonce'], 'wpdocs-my-nonce' ) && current_user_can( 'manage_options') ) {
+		
+		do_action('logger', $_REQUEST['nonce'] );
+
+        if ( isset( $_REQUEST['nonce'] ) && wp_verify_nonce( $_REQUEST['nonce'], DSCPF_Settings::ACTION) ) {
    
             flush_rewrite_rules();
-            echo "Flushed the rules";
+            _e("Flushed the rules", "DSCPF");
              
           } else {
-           
-            echo "Security check";
-
-           
+        	_e("Security check", "DSCPF");  
           }
         wp_die(); // this is required to terminate immediately and return a proper response
     }
