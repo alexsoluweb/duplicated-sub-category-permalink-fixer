@@ -96,10 +96,14 @@ class DSCPF_Settings {
                     'action': 'dscpf_flush_rewrite_rule',
                     'nonce': $("#_wpnonce").val(),
                 };
-        
                 // since 2.8 ajaxurl is always defined in the admin header and points to admin-ajax.php
                 $.post(ajaxurl, data, function(response) {
-                    $("#dscpf_response").text(response).css("color", "green");
+					var data = JSON.parse(response);
+					if(data.status == true){
+                    	$("#dscpf_response").text(data.message).css("color", "green");
+					}else{
+						$("#dscpf_response").text(data.message).css("color", "red");
+					}
                 });
             });
 
@@ -108,22 +112,24 @@ class DSCPF_Settings {
     }
     
     public function dscpf_action_server_ajax() {
-		
-		do_action('logger', $_REQUEST['nonce'] );
 
         if ( isset( $_REQUEST['nonce'] ) && wp_verify_nonce( $_REQUEST['nonce'], DSCPF_Settings::ACTION) ) {
-   
             flush_rewrite_rules();
-            _e("Flushed the rules", "DSCPF");
-             
+			$response = array(
+				"status" => 	true,
+				"message" => 	__("Flushed the rules successfully", "DSCPF")
+			);
           } else {
-        	_e("Security check", "DSCPF");  
+			$response = array(
+				"status" => 	false,
+				"message" => 	__("Security problem", "DSCPF")
+			);
           }
+		echo json_encode($response);
         wp_die(); // this is required to terminate immediately and return a proper response
     }
 }
 /* 
- * Retrieve this value with:
  * $dscpf_options = get_option( 'dscpf_option_name' ) // Array of All Options
  * $permalink_prefix = $dscpf_options['permalink_prefix']; //get the option
  */
