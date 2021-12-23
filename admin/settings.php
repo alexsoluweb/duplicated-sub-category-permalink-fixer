@@ -1,55 +1,22 @@
 <?php
 
 class DSCPF_Settings {
-	private $dscpf_options;
+	public $dscpf_options;
 	public CONST ACTION = "dscpf_option_group-options";
 
 	public function __construct() {
-		add_action( 'admin_menu', array( $this, 'dscpf_add_plugin_page' ) );
-		add_action( 'admin_init', array( $this, 'dscpf_page_init' ) );
+		add_action( 'admin_init', array( $this, 'dscpf_admin_init' ) );
+		add_action( 'admin_menu', array( $this, 'dscpf_admin_menu' ) );
         add_action( 'admin_footer', array($this, 'dscpf_action_client_ajax') ); // Write the ajax to flush rewrite rule
         add_action( 'wp_ajax_dscpf_flush_rewrite_rule', array($this, 'dscpf_action_server_ajax' )); //ajax admin handler
 
 	}
 
-	public function dscpf_add_plugin_page() {
-		add_management_page(
-			'DSCPF', // page_title
-			'DSCPF', // menu_title
-			'manage_options', // capability
-			'dscpf-settings', // menu_slug
-			array( $this, 'dscpf_create_tool_page' ), // function
-			1000000 // position
-		);
-	}
-
-	public function dscpf_create_tool_page() {
-		$this->dscpf_options = get_option( 'dscpf_option_name' ); ?>
-		<div class="wrap">
-			<h2>DSCPF</h2>
-			<p></p>
-			<?php settings_errors(); ?>
-
-			<form method="post" action="options.php">
-				<?php
-					settings_fields( 'dscpf_option_group' );
-					do_settings_sections( 'dscpf-admin' );
-                    ?>
-                    <label for="flush_rewrite_rule_btn">You must hit this button to activate the fix =>&nbsp;</label>
-                    <input id="flush_rewrite_rule_btn" type="button" name="btn_flush_rewrite_rule" value="Flush rewrite rule">
-                    <span id="dscpf_response"></span>
-                    <?php
-					submit_button();
-				?>
-			</form>
-		</div>
-	<?php }
-
-	public function dscpf_page_init() {
+	public function dscpf_admin_init() {
 		register_setting(
 			'dscpf_option_group', // option_group
-			'dscpf_option_name', // option_name
-			array( $this, 'dscpf_sanitize' ) // sanitize_callback
+			'dscpf_options', // option_name
+			array( $this, 'dscpf_sanitize_fields' ) // sanitize_callback
 		);
 		
 		add_settings_section(
@@ -61,14 +28,73 @@ class DSCPF_Settings {
 
         add_settings_field(
 			'permalink_prefix', // id
-			'Permalink category prefix', // title
+			'Permalink category prefix (default category)', // title
 			array( $this, 'permalink_prefix' ), // callback output field
 			'dscpf-admin', // page
 			'dscpf_setting_section' // section
 		);
 	}
 
-	public function dscpf_sanitize($input) {
+	public function dscpf_admin_menu() {
+		add_management_page(
+			'DSCPF', // page_title
+			'DSCPF', // menu_title
+			'manage_options', // capability
+			'dscpf-settings', // menu_slug
+			array( $this, 'dscpf_output_page' ), // function
+			1000000 // position
+		);
+	}
+
+	public function dscpf_output_page() {
+		$this->dscpf_options = get_option( 'dscpf_options' ); ?>
+		<div class="wrap">
+			<h2>DSCPF</h2>
+			<p></p>
+			<?php settings_errors(); ?>
+
+			<form method="post" action="options.php">
+				<?php
+					settings_fields( 'dscpf_option_group' );
+					do_settings_sections( 'dscpf-admin' );
+					submit_button();
+				?>
+				<label for="flush_rewrite_rule_btn">You must hit this button to activate the fix =>&nbsp;</label>
+				<input id="flush_rewrite_rule_btn" type="button" name="btn_flush_rewrite_rule" value="Flush rewrite rule">
+				<span id="dscpf_response"></span>
+			</form>
+		</div>
+		<br>
+		<div class="wrap">
+			<pre>
+#########################################################################
+# Synopsis
+#########################################################################
+
+(A) Not duplicated categories structure slugs example:
+		One hierarchical:		maincat1/
+		Two hierarchical:		maincat1/subcat
+		Three hierarchical:		maincat1/subcat/subsubcat
+
+(B) Duplicated categories structures slugs must follow this structure:
+		One hierarchical:		maincat2/
+		Two hierarchical:		maincat2/subcat-maincat2
+		Three hierarchical:		maincat2/subcat-maincat2/subsubcat-subcat-maincat2
+
+(C) New permalinks on duplicated categories will generate this:
+		One hierarchical:		maincat2/
+		Two hierarchical:		maincat2/subcat
+		Three hierarchical:		maincat2/subcat/subsubcat
+
+<b style="color:red">
+IMPORTANT: Duplicated categories structures slugs must follow the structure demonstrated at (B)
+to make this plugin work properly. This is the default way that Wordpress name the duplicated slugs on category taxonomy.
+</b>
+			</pre>
+		</div>
+	<?php }
+
+	public function dscpf_sanitize_fields($input) {
 		$sanitary_values = array();
 		if ( isset( $input['permalink_prefix'] ) ) {
 			$sanitary_values['permalink_prefix'] = sanitize_text_field( $input['permalink_prefix'] );
@@ -82,11 +108,10 @@ class DSCPF_Settings {
 
 	public function permalink_prefix() {
 		printf(
-			'<input class="regular-text" type="text" name="dscpf_option_name[permalink_prefix]" id="permalink_prefix" value="%s">',
-			isset( $this->dscpf_options['permalink_prefix'] ) ? esc_attr( $this->dscpf_options['permalink_prefix']) : ''
+			'<input class="regular-text" type="text" name="dscpf_options[permalink_prefix]" id="permalink_prefix" value="%s">',
+			isset( $this->dscpf_options['permalink_prefix'] ) ? esc_attr( $this->dscpf_options['permalink_prefix']) : 'category'
 		);
 	}
-
 
     public function dscpf_action_client_ajax() { ?>
         <script id="js_flush_ajax_call" type="text/javascript" >
@@ -130,6 +155,6 @@ class DSCPF_Settings {
     }
 }
 /* 
- * $dscpf_options = get_option( 'dscpf_option_name' ) // Array of All Options
+ * $dscpf_options = get_option( 'dscpf_options' ) // Array of All Options
  * $permalink_prefix = $dscpf_options['permalink_prefix']; //get the option
  */
