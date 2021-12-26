@@ -2,15 +2,16 @@
 
 class DSCPF_Settings {
 	public $dscpf_options;
-	public CONST ACTION = "dscpf_option_group-options";
+	public CONST ACTION = "dscpf_option_group-options"; //Action name for ajax calls
 	public CONST DSCPF_OPTION_NAME = "dscpf_options";
+	public static $category_base = "";
 
 	public function __construct() {
 		add_action( 'admin_init', array( $this, 'dscpf_admin_init' ) );
 		add_action( 'admin_menu', array( $this, 'dscpf_admin_menu' ) );
         add_action( 'admin_footer', array($this, 'dscpf_action_client_ajax') ); // Write the ajax to flush rewrite rule
         add_action( 'wp_ajax_dscpf_flush_rewrite_rule', array($this, 'dscpf_action_server_ajax' )); //ajax admin handler
-
+		DSCPF_Settings::$category_base = get_option('category_base') ? get_option('category_base') : 'category';
 	}
 
 	public function dscpf_admin_init() {
@@ -29,8 +30,8 @@ class DSCPF_Settings {
 
         add_settings_field(
 			'permalink_prefix', // id
-			'Current category prefix (default category)', // title
-			array( $this, 'permalink_prefix' ), // callback output field
+			'Current category base:', // title
+			array( $this, 'output_field_permalink_prefix' ), // callback output field
 			'dscpf-admin', // page
 			'dscpf_setting_section' // section
 		);
@@ -108,11 +109,11 @@ to make this plugin work properly. This is the default way that Wordpress name t
 		
 	}
 
-	public function permalink_prefix() {
+	public function output_field_permalink_prefix() {
 		printf(
 			'<input readonly class="regular-text" type="text" name="%s[permalink_prefix]" id="permalink_prefix" value="%s">',
 			DSCPF_Settings::DSCPF_OPTION_NAME,
-			isset( $this->dscpf_options['permalink_prefix'] ) ? esc_attr( $this->dscpf_options['permalink_prefix']) : 'category'
+			isset( $this->dscpf_options['permalink_prefix'] ) ? esc_attr( $this->dscpf_options['permalink_prefix']) : DSCPF_Settings::$category_base
 		);
 	}
 

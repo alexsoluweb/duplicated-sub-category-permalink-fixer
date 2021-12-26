@@ -8,7 +8,7 @@
 * Plugin Name:       DSCPF
 * Plugin URI:        https://github.com/alexsoluweb/duplicated-sub-category-permalink-fixer
 * Description:       Fix duplicated sub categories permalink
-* Version:           1.0.0
+* Version:           1.0
 * Author:            Alexsoluweb
 * Author URI:        alexsoluweb.digital
 * License:           GPL-2.0+
@@ -37,16 +37,19 @@ function dscpf_run(){
 
 // Add rewrite rules for new permalinks
 function dscpf_add_rewrite_rules(){
-	$PREFIX_PERMALINK = "category";
+	$PREFIX_PERMALINK = get_option('category_base') ? get_option('category_base') : 'category';
 	$cats = get_categories();
 	
 	foreach($cats as $cat){
 		if($cat->parent != 0 && strpos($cat->slug, '-') != false){
-				$splitted_slug = explode("-", $cat->slug);
+			$splitted_slug = explode("-", $cat->slug);
 			$new_permalink = "/";
 			$slugs	= array_reverse($splitted_slug);
 			for($i =0; $i < count($slugs); $i++){$new_permalink .= $slugs[$i] . "/";}
+			// Add duplicated subcategories rewrite rules
 			add_rewrite_rule($PREFIX_PERMALINK . $new_permalink .'?$', 'index.php?cat='.$cat->term_id ,'top');
+			// Add paged rewrite rules support
+			add_rewrite_rule($PREFIX_PERMALINK.$new_permalink .'page/([0-9]{1,})/?$', 'index.php?cat='.$cat->term_id.'&paged=$matches[1]','top');
 		}
 	}	
 }
