@@ -5,6 +5,34 @@ class DSCPF_Settings {
 	public CONST ACTION = "dscpf_option_group-options"; //Action name for ajax calls
 	public CONST DSCPF_OPTION_NAME = "dscpf_options";
 	public static $category_base = "";
+	private CONST SETTING_SYNOPSIS = 
+	"
+	SYNOPSIS
+	########################################################################
+	
+	(A) Not duplicated categories structure slugs example:
+			One hierarchical:		maincat1/
+			Two hierarchical:		maincat1/subcat
+			Three hierarchical:		maincat1/subcat/subsubcat
+	
+	(B) Duplicated categories structures slugs must follow this structure:
+			One hierarchical:		maincat2/
+			Two hierarchical:		maincat2/subcat-maincat2
+			Three hierarchical:		maincat2/subcat-maincat2/subsubcat-subcat-maincat2
+	
+	(C) New permalinks on duplicated categories will generate this:
+			One hierarchical:		maincat2/
+			Two hierarchical:		maincat2/subcat
+			Three hierarchical:		maincat2/subcat/subsubcat
+	
+	<b style=\"color:red\">
+	IMPORTANT:
+
+	(1) Duplicated categories structures slugs must follow the structure demonstrated at (B)
+	to make this plugin work properly. This is the default way that Wordpress name the duplicated slugs on category taxonomy.
+
+	(2) Do not remove the categories prefix with any plugins. This plugin does not support this custom feature.
+	</b>";
 
 	public function __construct() {
 		add_action( 'admin_init', array( $this, 'dscpf_admin_init' ) );
@@ -62,38 +90,14 @@ class DSCPF_Settings {
 					do_settings_sections( 'dscpf-admin' );
 					//submit_button();
 				?>
-				<label for="flush_rewrite_rule_btn">You must hit this button to activate the fix =>&nbsp;</label>
-				<input id="flush_rewrite_rule_btn" type="button" name="btn_flush_rewrite_rule" value="Flush rewrite rule">
+				<label for="flush_rewrite_rule_btn">You must flush the rules to activate the fix:&nbsp;</label>
+				<input id="flush_rewrite_rule_btn" type="button" name="btn_flush_rewrite_rule" value="Flush the rules">
 				<span id="dscpf_response"></span>
 			</form>
 		</div>
 		<br>
 		<div class="wrap">
-			<pre>
-#########################################################################
-# Synopsis
-#########################################################################
-
-(A) Not duplicated categories structure slugs example:
-		One hierarchical:		maincat1/
-		Two hierarchical:		maincat1/subcat
-		Three hierarchical:		maincat1/subcat/subsubcat
-
-(B) Duplicated categories structures slugs must follow this structure:
-		One hierarchical:		maincat2/
-		Two hierarchical:		maincat2/subcat-maincat2
-		Three hierarchical:		maincat2/subcat-maincat2/subsubcat-subcat-maincat2
-
-(C) New permalinks on duplicated categories will generate this:
-		One hierarchical:		maincat2/
-		Two hierarchical:		maincat2/subcat
-		Three hierarchical:		maincat2/subcat/subsubcat
-
-<b style="color:red">
-IMPORTANT: Duplicated categories structures slugs must follow the structure demonstrated at (B)
-to make this plugin work properly. This is the default way that Wordpress name the duplicated slugs on category taxonomy.
-</b>
-			</pre>
+			<pre><?php print(DSCPF_Settings::SETTING_SYNOPSIS); ?></pre>
 		</div>
 	<?php }
 

@@ -17,6 +17,7 @@
 ## When beta goes to alpha
 - Push it to the Wordpress repository
 
-## Ressource:
+## References:
 - https://stackoverflow.com/questions/28169931/is-there-a-way-to-create-duplicated-subcategory-slugs-on-wordpress/70309035#70309035
 - https://wordpress.stackexchange.com/questions/215150/how-to-remove-wordpress-category-from-url-and-have-a-custom-pagination-parameter
+- https://stackoverflow.com/questions/12806409/allow-duplicate-taxonomy-slugs-wordpress?rq=1
