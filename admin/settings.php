@@ -3,6 +3,7 @@
 class DSCPF_Settings {
 	public $dscpf_options;
 	public CONST ACTION = "dscpf_option_group-options";
+	public CONST DSCPF_OPTION_NAME = "dscpf_options";
 
 	public function __construct() {
 		add_action( 'admin_init', array( $this, 'dscpf_admin_init' ) );
@@ -15,7 +16,7 @@ class DSCPF_Settings {
 	public function dscpf_admin_init() {
 		register_setting(
 			'dscpf_option_group', // option_group
-			'dscpf_options', // option_name
+			DSCPF_Settings::DSCPF_OPTION_NAME, // option_name
 			array( $this, 'dscpf_sanitize_fields' ) // sanitize_callback
 		);
 		
@@ -28,11 +29,12 @@ class DSCPF_Settings {
 
         add_settings_field(
 			'permalink_prefix', // id
-			'Permalink category prefix (default category)', // title
+			'Current category prefix (default category)', // title
 			array( $this, 'permalink_prefix' ), // callback output field
 			'dscpf-admin', // page
 			'dscpf_setting_section' // section
 		);
+		$this->dscpf_options = get_option( DSCPF_Settings::DSCPF_OPTION_NAME );
 	}
 
 	public function dscpf_admin_menu() {
@@ -47,7 +49,7 @@ class DSCPF_Settings {
 	}
 
 	public function dscpf_output_page() {
-		$this->dscpf_options = get_option( 'dscpf_options' ); ?>
+		?>
 		<div class="wrap">
 			<h2>DSCPF</h2>
 			<p></p>
@@ -57,7 +59,7 @@ class DSCPF_Settings {
 				<?php
 					settings_fields( 'dscpf_option_group' );
 					do_settings_sections( 'dscpf-admin' );
-					submit_button();
+					//submit_button();
 				?>
 				<label for="flush_rewrite_rule_btn">You must hit this button to activate the fix =>&nbsp;</label>
 				<input id="flush_rewrite_rule_btn" type="button" name="btn_flush_rewrite_rule" value="Flush rewrite rule">
@@ -108,7 +110,8 @@ to make this plugin work properly. This is the default way that Wordpress name t
 
 	public function permalink_prefix() {
 		printf(
-			'<input class="regular-text" type="text" name="dscpf_options[permalink_prefix]" id="permalink_prefix" value="%s">',
+			'<input readonly class="regular-text" type="text" name="%s[permalink_prefix]" id="permalink_prefix" value="%s">',
+			DSCPF_Settings::DSCPF_OPTION_NAME,
 			isset( $this->dscpf_options['permalink_prefix'] ) ? esc_attr( $this->dscpf_options['permalink_prefix']) : 'category'
 		);
 	}

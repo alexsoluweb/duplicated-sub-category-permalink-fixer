@@ -1,17 +1,19 @@
-# Project on development
-- v1.0.0 on beta
-- You can test it on a dev environment but i dont recommend using it on productions.
+# Current Project
+- Stage: On development
+- Version: 1.0
 
 ## Contributors all welcome =]
 - Just ask for a pull request
 
-
-## What you can contribute on:
-
+## TODO:
+- Check if pretty permalink is set on Wordpress Settings
+- Add paged rewrited rules
 - Check for securities issues
-- Make this conform to Wordpress
+- Make this conform to Wordpress Standard
 - Bug testing
-- Any improvments
+
+## Imporvments:
+- Let user change the base Category name
 
 ## When beta goes to alpha
 - Push it to the Wordpress repository
