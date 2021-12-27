@@ -38,7 +38,6 @@ class DSCPF_Settings {
 	public function __construct() {
 		add_action( 'admin_init', array( $this, 'dscpf_admin_init' ) );
 		add_action( 'admin_menu', array( $this, 'dscpf_admin_menu' ) );
-		add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), 'dscpf_add_action_links' ); //Add settings link to plugins page
 		
 		// Set Class Properties
 		DSCPF_Settings::$category_base = get_option('category_base') ? get_option('category_base') : 'category';
@@ -190,14 +189,6 @@ class DSCPF_Settings {
 				add_rewrite_rule($PREFIX_PERMALINK.$new_permalink .'page/([0-9]{1,})/?$', 'index.php?cat='.$cat->term_id.'&paged=$matches[1]','top');
 			}
 		}	
-	}
-
-	// Link to settings page from plugins screen
-	public function dscpf_add_action_links ( $links ) {
-		$mylinks = array(
-			'<a href="' . admin_url( 'tools.php?page=dscpf-settings' ) . '">Settings</a>',
-		);
-		return array_merge( $links, $mylinks );
 	}
 
 }

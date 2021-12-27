@@ -23,6 +23,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define('PLUGIN_PREFIX', 'dscpf');
 require_once __DIR__ . '/admin/settings.php';
+//Add settings link to plugins page
+add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), 'dscpf_add_action_links' ); 
 
 // Bootstrap for the plugin
 add_action('init', 'dscpf_run');
@@ -54,6 +56,15 @@ function dscpf_new_permalinks( $permalink, $term, $taxonomy ){
 		return $new_permalink;
 	}
 	return $permalink;   
+}
+
+
+// Link to settings page from plugins screen
+function dscpf_add_action_links ( $links ) {
+	$mylinks = array(
+		'<a href="' . admin_url( 'tools.php?page=dscpf-settings' ) . '">Settings</a>',
+	);
+	return array_merge( $links, $mylinks );
 }
 
 // Plugin activation
