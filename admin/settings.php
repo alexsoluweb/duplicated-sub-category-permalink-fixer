@@ -1,6 +1,7 @@
 <?php
 
 class DSCPF_Settings {
+	public static $is_pretty_permalink_active = false;
 	public $dscpf_options;
 	public CONST ACTION = "dscpf_option_group-options"; //Action name for ajax calls
 	public CONST DSCPF_OPTION_NAME = "dscpf_options";
@@ -17,8 +18,8 @@ class DSCPF_Settings {
 	
 	(B) Duplicated categories structures slugs must follow this structure:
 			One hierarchical:		maincat2/
-			Two hierarchical:		maincat2/subcat-maincat2
-			Three hierarchical:		maincat2/subcat-maincat2/subsubcat-subcat-maincat2
+			Two hierarchical:		maincat2/<b style=\"color:green\">subcat-maincat2</b>
+			Three hierarchical:		maincat2/subcat-maincat2/<b style=\"color:green\">subsubcat-subcat-maincat2</b>
 	
 	(C) New permalinks on duplicated categories will generate this:
 			One hierarchical:		maincat2/
@@ -31,15 +32,23 @@ class DSCPF_Settings {
 	(1) Duplicated categories structures slugs must follow the structure demonstrated at (B)
 	to make this plugin work properly. This is the default way that Wordpress name the duplicated slugs on category taxonomy.
 
-	(2) Do not remove the categories prefix with any plugins. This plugin does not support this custom feature.
+	(2) Do not remove the categories prefix in the URLs with any plugins. This plugin does not support this custom feature.
 	</b>";
 
 	public function __construct() {
 		add_action( 'admin_init', array( $this, 'dscpf_admin_init' ) );
 		add_action( 'admin_menu', array( $this, 'dscpf_admin_menu' ) );
-        add_action( 'admin_footer', array($this, 'dscpf_action_client_ajax') ); // Write the ajax to flush rewrite rule
-        add_action( 'wp_ajax_dscpf_flush_rewrite_rule', array($this, 'dscpf_action_server_ajax' )); //ajax admin handler
+		add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), 'dscpf_add_action_links' ); //Add settings link to plugins page
+		
+		// Set Class Properties
 		DSCPF_Settings::$category_base = get_option('category_base') ? get_option('category_base') : 'category';
+		$this->dscpf_options = get_option( DSCPF_Settings::DSCPF_OPTION_NAME );
+		if(get_option('permalink_structure')  && !empty(get_option('permalink_structure'))){
+			DSCPF_Settings::$is_pretty_permalink_active = true;
+			add_action( 'admin_footer', array($this, 'dscpf_action_client_ajax') ); // Write the ajax to flush rewrite rule
+			add_action( 'wp_ajax_dscpf_flush_rewrite_rule', array($this, 'dscpf_action_server_ajax' )); //ajax admin handler
+			$this->dscpf_add_rewrite_rules();
+		}
 	}
 
 	public function dscpf_admin_init() {
@@ -63,7 +72,6 @@ class DSCPF_Settings {
 			'dscpf-admin', // page
 			'dscpf_setting_section' // section
 		);
-		$this->dscpf_options = get_option( DSCPF_Settings::DSCPF_OPTION_NAME );
 	}
 
 	public function dscpf_admin_menu() {
@@ -78,6 +86,10 @@ class DSCPF_Settings {
 	}
 
 	public function dscpf_output_page() {
+		if(DSCPF_Settings::$is_pretty_permalink_active == false){
+			print("<pre>You must activate the pretty permalink structure in Wordpress in settings/permalink</pre>");
+			return;
+		}
 		?>
 		<div class="wrap">
 			<h2>DSCPF</h2>
@@ -99,7 +111,8 @@ class DSCPF_Settings {
 		<div class="wrap">
 			<pre><?php print(DSCPF_Settings::SETTING_SYNOPSIS); ?></pre>
 		</div>
-	<?php }
+	<?php 
+	}
 
 	public function dscpf_sanitize_fields($input) {
 		$sanitary_values = array();
@@ -109,9 +122,7 @@ class DSCPF_Settings {
 		return $sanitary_values;
 	}
 
-	public function dscpf_section_info() {
-		
-	}
+	public function dscpf_section_info() {}
 
 	public function output_field_permalink_prefix() {
 		printf(
@@ -161,8 +172,32 @@ class DSCPF_Settings {
 		echo json_encode($response);
         wp_die(); // this is required to terminate immediately and return a proper response
     }
+
+	// Add rewrite rules for new permalinks
+	public function dscpf_add_rewrite_rules(){
+		$PREFIX_PERMALINK = get_option('category_base') ? get_option('category_base') : 'category';
+		$cats = get_categories();
+		
+		foreach($cats as $cat){
+			if($cat->parent != 0 && strpos($cat->slug, '-') != false){
+				$splitted_slug = explode("-", $cat->slug);
+				$new_permalink = "/";
+				$slugs	= array_reverse($splitted_slug);
+				for($i =0; $i < count($slugs); $i++){$new_permalink .= $slugs[$i] . "/";}
+				// Add duplicated subcategories rewrite rules
+				add_rewrite_rule($PREFIX_PERMALINK . $new_permalink .'?$', 'index.php?cat='.$cat->term_id ,'top');
+				// Add paged rewrite rules support
+				add_rewrite_rule($PREFIX_PERMALINK.$new_permalink .'page/([0-9]{1,})/?$', 'index.php?cat='.$cat->term_id.'&paged=$matches[1]','top');
+			}
+		}	
+	}
+
+	// Link to settings page from plugins screen
+	public function dscpf_add_action_links ( $links ) {
+		$mylinks = array(
+			'<a href="' . admin_url( 'tools.php?page=dscpf-settings' ) . '">Settings</a>',
+		);
+		return array_merge( $links, $mylinks );
+	}
+
 }
-/* 
- * $dscpf_options = get_option( 'dscpf_options' ) // Array of All Options
- * $permalink_prefix = $dscpf_options['permalink_prefix']; //get the option
- */
