@@ -7,7 +7,6 @@
 
 ## TODO:
 - Support for feed and embed URLs rewrite rules
-- Check if pretty permalink is set on Wordpress Settings
 - Check for securities issues
 - Make this conform to Wordpress Standard
 - Bug testing
