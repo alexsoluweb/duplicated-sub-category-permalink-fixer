@@ -1,6 +1,6 @@
 # Current Project
 - Stage: On development
-- Version: 1.0
+- Version: 1.0 [BETA]
 
 ## Contributors all welcome =]
 - Just ask for a pull request
